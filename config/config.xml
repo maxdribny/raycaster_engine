@@ -1,0 +1,58 @@
+<config>
+  <variable name="WINDOW_WIDTH">
+    <value>1024</value>
+    <type>int</type>
+  </variable>
+  <variable name="WINDOW_HEIGHT">
+    <value>512</value>
+    <type>int</type>
+  </variable>
+  <variable name="WINDOW_TITLE">
+    <value>Raycaster 0.0.1</value>
+    <type>str</type>
+  </variable>
+  <variable name="WORLD_SCALE">
+    <value>64</value>
+    <type>int</type>
+  </variable>
+  <variable name="WORLD_SIZE_X">
+    <value>8</value>
+    <type>int</type>
+  </variable>
+  <variable name="WORLD_SIZE_Y">
+    <value>8</value>
+    <type>int</type>
+  </variable>
+  <variable name="PLAYER_INITIAL_X">
+    <value>300.0</value>
+    <type>float</type>
+  </variable>
+  <variable name="PLAYER_INITIAL_Y">
+    <value>300.0</value>
+    <type>float</type>
+  </variable>
+  <variable name="PLAYER_INITIAL_ANGLE">
+    <value>0</value>
+    <type>int</type>
+  </variable>
+  <variable name="PLAYER_ROTATION_SPEED">
+    <value>35</value>
+    <type>int</type>
+  </variable>
+  <variable name="PLAYER_MOVE_SPEED">
+    <value>25</value>
+    <type>int</type>
+  </variable>
+  <variable name="PLAYER_COLOR">
+    <value>(1, 1, 0)</value>
+    <type>tuple</type>
+  </variable>
+  <variable name="RENDER_FOV">
+    <value>60</value>
+    <type>int</type>
+  </variable>
+  <variable name="DEBUG_LOG_TO_CONSOLE">
+    <value>True</value>
+    <type>bool</type>
+  </variable>
+</config>
