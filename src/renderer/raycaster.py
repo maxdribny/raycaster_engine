@@ -20,7 +20,6 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
     # Calcualte shift value based on world scale
     if bits_to_shift == 0:
         shift_value = int(math.log2(world_size))
-        bits_to_shift = shift_value
     else:
         shift_value = bits_to_shift
 
