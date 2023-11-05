@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import os
 
 from src.exceptions.constant_exceptions import *
+from pprint import pprint
 
 IS_BUILD_VERSION = True
 VERSION = '0.0.1'
@@ -68,7 +69,7 @@ def load_config_from_xml(file_path):
         elif value_type == 'str':
             value = value_str
         else:
-            print(f"Unsupported type {value_type} for variable {variable_name}. Skipping.")
+            print(f"\nUnsupported type {value_type} for variable {variable_name}. Skipping.")
             continue
 
         print(f'\nFound variable {variable_name} with value {value}')
@@ -109,7 +110,7 @@ def create_default_config(directory, file_name):
     file_path = os.path.join(directory, file_name)
 
     # Check if the file exists
-    print(f'Checking if {file_path} exists')
+    print(f'Checking if {file_path} exists\n')
 
     # TODO: this is very hacky, think of something better
     if IS_BUILD_VERSION:
@@ -118,6 +119,7 @@ def create_default_config(directory, file_name):
             os.remove(file_path)
 
     if not os.path.exists(file_path):
+        print(f'File {file_path} does not exist, creating default config with default parameters: \n')
         # Define default settings
         default_settings = [
             {"name": "WINDOW_WIDTH", "value": str(WINDOW_WIDTH), "type": "int"},
@@ -135,6 +137,8 @@ def create_default_config(directory, file_name):
             {"name": "RENDER_FOV", "value": str(RENDER_FOV), "type": "int"},
             {"name": "DEBUG_LOG_TO_CONSOLE", "value": str(DEBUG_LOG_TO_CONSOLE), "type": "bool"},
         ]
+
+        pprint(default_settings, indent=4)
 
         # Create an XML tree with default settings
         config = ET.Element("config")

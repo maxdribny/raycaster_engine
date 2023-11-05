@@ -15,7 +15,7 @@ class Logger:
 
         :param message: The message to be logged.
         """
-        self._print_message("LOG", message)
+        self._print_message("\nLOG", message)
 
     def debug(self, message: str):
         """
@@ -24,7 +24,7 @@ class Logger:
         :param message: The message to be logged.
         """
         if self.debug_mode:
-            self._print_message("DEBUG", message)
+            self._print_message("\nDEBUG", message)
 
     def _print_message(self, level: str, message: str):  # noqa
         """

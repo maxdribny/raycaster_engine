@@ -10,6 +10,6 @@ FLAGS = {
 print(f'Building version {FLAGS["VERSION"]}')
 
 command = 'pyinstaller'
-params = ['--onefile', '--log-level', 'TRACE', 'main.py']
+params = ['--log-level', 'TRACE', 'main.py']
 
 subprocess.run([command] + params)
