@@ -126,9 +126,11 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
             else:
                 break  # Exit the loop if we are out of bounds
 
+        shade = 1.0
         # Vertical wall hit
         if distance_v < distance_h:
             # Set the color to be darker
+            shade = 0.5
             color = (0.62, 0.125, 0.941)
             # color = (0, 1, 0)
             rx = vx
@@ -142,7 +144,7 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
             ry = hy
             distance = distance_h
 
-        yield r, ra, rx, ry, distance, color
+        yield r, ra, rx, ry, distance, color, shade
 
         ra += math.radians(1)
         if ra < 0:
