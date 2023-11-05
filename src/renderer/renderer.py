@@ -142,9 +142,16 @@ class Renderer:
         for y in range(int(line_height)):
             texture_color = ALL_TEXTURES[int(texture_y) * 32 + int(texture_x)] * shade
 
-            # Draw wall
-            # glColor3f(*color)
-            glColor3f(texture_color, texture_color, texture_color)
+            # Draw walls with textures and colors
+            if map_texture_pos == 0:
+                glColor3f(texture_color, texture_color / 2.0, texture_color / 2.0)  # Checkerboard red
+            if map_texture_pos == 1:
+                glColor3f(texture_color, texture_color, texture_color / 2.0)  # Brick yellow
+            if map_texture_pos == 2:
+                glColor3f(texture_color / 2.0, texture_color / 2.0, texture_color)  # Window blue
+            if map_texture_pos == 3:
+                glColor3f(texture_color / 2.0, texture_color, texture_color / 2.0)  # Door green
+
             glVertex2i(ray_n * 8 + 530, int(y + line_offset))
             texture_y += texture_step
 
@@ -170,7 +177,6 @@ class Renderer:
         self.draw_ceiling()
         self.draw_floor()
         self.draw_rays_2d()
-        # self.draw_world_3d(self.ray_data)  # Call this after draw_rays_2d() to draw the rays on top of the 3D world
         self.draw_player()
         self.draw_fps()
         glutSwapBuffers()
