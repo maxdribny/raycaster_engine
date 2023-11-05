@@ -4,7 +4,7 @@ import subprocess
 
 # Build flags
 FLAGS = {
-    'VERSION': '0.0.1'
+    'VERSION': '0.0.2'
 }
 
 print(f'Building version {FLAGS["VERSION"]}')

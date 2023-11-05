@@ -21,6 +21,9 @@ class Renderer:
         self.draw_offset = 50
         self.fps_callback = fps_callback
 
+        # Precompute and cache vertices
+        self.cached_vertices = self.precompute_vertices()
+
     def get_current_fps(self):
         current_time = time.time()
         delta_time = current_time - self.last_frame_time
@@ -40,28 +43,62 @@ class Renderer:
 
         return average_fps
 
-    def draw_world_2d(self):
+    def precompute_vertices(self):
+        vertices = []
+        border_thickness = 1
+        print(f'\nComputing vertices...')
         for y in range(self.controller.world.y):
             for x in range(self.controller.world.x):
-
-                if self.controller.world.world_map_walls[y * self.controller.world.x + x] > 0:  # Draw a wall
-                    glColor3f(1, 1, 1)
-                else:
-                    glColor3f(0, 0, 0)
+                is_wall = self.controller.world.world_map_walls[y * self.controller.world.x + x] > 0
 
                 x_offset = x * self.controller.world.world_scale
                 y_offset = y * self.controller.world.world_scale
 
-                # @formatter:off
-                glBegin(GL_QUADS)
-                glVertex2i(x_offset + 1                              , y_offset + 1)                               # noqa
-                glVertex2i(x_offset + 1                              , y_offset + self.controller.world.world_scale - 1) # noqa
-                glVertex2i(x_offset + self.controller.world.world_scale - 1,
-                                                                       y_offset + self.controller.world.world_scale - 1) # noqa
-                glVertex2i(x_offset + self.controller.world.world_scale - 1,
-                                                                       y_offset + 1) # noqa
-                glEnd()
-                # @formatter:on
+                # Slightly smaller coordinates for drawing the quad
+                v1 = (x_offset + border_thickness, y_offset + border_thickness)
+                v2 = (x_offset + border_thickness, y_offset + self.controller.world.world_scale - border_thickness)
+                v3 = (x_offset + self.controller.world.world_scale - border_thickness,
+                      y_offset + self.controller.world.world_scale - border_thickness)
+                v4 = (x_offset + self.controller.world.world_scale - border_thickness, y_offset + border_thickness)
+
+                vertices.append((is_wall, v1, v2, v3, v4))
+
+        print(f'Vertices computed: {len(vertices)}')
+        return vertices
+
+    def draw_world_2d(self):
+        for is_wall, v1, v2, v3, v4 in self.cached_vertices:
+            glColor3f(1, 1, 1) if is_wall else glColor3f(0, 0, 0)
+
+            glBegin(GL_QUADS)
+            glVertex2i(*v1)
+            glVertex2i(*v2)
+            glVertex2i(*v3)
+            glVertex2i(*v4)
+            glEnd()
+
+    # def draw_world_2d(self):
+    #     for y in range(self.controller.world.y):
+    #         for x in range(self.controller.world.x):
+    #
+    #             if self.controller.world.world_map_walls[y * self.controller.world.x + x] > 0:  # Draw a wall
+    #                 glColor3f(1, 1, 1)
+    #             else:
+    #                 glColor3f(0, 0, 0)
+    #
+    #             x_offset = x * self.controller.world.world_scale
+    #             y_offset = y * self.controller.world.world_scale
+    #
+    #             # @formatter:off
+    #             glBegin(GL_QUADS)
+    #             glVertex2i(x_offset + 1                              , y_offset + 1)                               # noqa
+    #             glVertex2i(x_offset + 1                              , y_offset + self.controller.world.world_scale - 1) # noqa
+    #             glVertex2i(x_offset + self.controller.world.world_scale - 1,
+    #                        y_offset + self.controller.world.world_scale - 1) # noqa
+    #             glVertex2i(x_offset + self.controller.world.world_scale - 1,
+    #                        y_offset + 1) # noqa
+    #             glEnd()
+    #             # @formatter:on
 
     def draw_rays_2d(self):
         player_angle = self.controller.player.angle
