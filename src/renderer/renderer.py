@@ -16,7 +16,6 @@ from src.renderer.raycaster import raycaster_2d
 class Renderer:
     def __init__(self, game_controller, fps_callback=None):
         self.controller = game_controller
-        self.ray_data = []
         self.last_frame_time = time.time()
         self.fps_list = []
         self.display_fps = True
@@ -46,7 +45,7 @@ class Renderer:
         for y in range(self.controller.world.y):
             for x in range(self.controller.world.x):
 
-                if self.controller.world.world_map[y * self.controller.world.x + x] == 1:  # Draw a wall
+                if self.controller.world.world_map_walls[y * self.controller.world.x + x] > 0:  # Draw a wall
                     glColor3f(1, 1, 1)
                 else:
                     glColor3f(0, 0, 0)
@@ -65,7 +64,9 @@ class Renderer:
                 glEnd()
                 # @formatter:on
 
-    def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, rx, ry, world_height=320, world_width=160):
+    def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, map_texture_pos, rx, ry, world_height=320,
+                      world_width=160):
+
         world_height = world_height
         world_width = world_width
         line_offset_scale = 1.2
@@ -105,7 +106,7 @@ class Renderer:
             if 90 < ra < 270:
                 texture_x = 31 - texture_x
 
-        texture_y = texture_offset * texture_step
+        texture_y = texture_offset * texture_step + map_texture_pos * 32
 
         for y in range(int(line_height)):
             texture_color = ALL_TEXTURES[int(texture_y) * 32 + int(texture_x)] * shade
@@ -120,16 +121,15 @@ class Renderer:
             texture_y += texture_step
 
     def draw_rays_2d(self):
-        self.ray_data = []  # Clear previous ray data
         player_angle = self.controller.player.angle
         player_x = self.controller.player.x
         player_y = self.controller.player.y
 
-        for r, ra, rx, ry, distance, color, shade in raycaster_2d(player_angle,
-                                                                  player_x,
-                                                                  player_y,
-                                                                  self.controller,
-                                                                  num_rays=self.controller.player.FOV):
+        for r, ra, rx, ry, distance, color, shade, map_texture_pos in raycaster_2d(player_angle,
+                                                                                   player_x,
+                                                                                   player_y,
+                                                                                   self.controller,
+                                                                                   num_rays=self.controller.player.FOV):
             # Draw the rays being cast
             glColor3f(0.8, 0, 0)  # Red
             glLineWidth(1)
@@ -138,7 +138,7 @@ class Renderer:
             glVertex2i(int(rx), int(ry))
             glEnd()
 
-            self.draw_world_3d(distance, r, player_angle, ra, color, shade, rx=rx, ry=ry)
+            self.draw_world_3d(distance, r, player_angle, ra, color, shade, map_texture_pos, rx=rx, ry=ry)
 
             # Store the ray data for 3D drawing
             # self.ray_data.append((distance, r, player_angle, rx))

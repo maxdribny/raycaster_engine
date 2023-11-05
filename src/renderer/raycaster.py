@@ -27,6 +27,9 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
         shift_value = BITS_TO_SHIFT
 
     for r in range(num_rays):
+
+        map_texture_vert = map_texture_horz = 0  # Vertical and horizontal map textures
+
         # --------------------------------------------
         # -------- Check Horizontal Lines ------------
         # --------------------------------------------
@@ -64,10 +67,12 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
                 world_grid_index = map_y * game_controller.world.x + map_x
 
                 # Hit a wall
-                if 0 < world_grid_index < world_size * game_controller.world.y and game_controller.world.world_map[
-                    world_grid_index] > 0:  # noqa
+                if 0 < world_grid_index < world_size * game_controller.world.y and \
+                        game_controller.world.world_map_walls[
+                            world_grid_index] > 0:  # noqa
                     hx, hy = rx, ry
                     distance_h = distance_two_points(obj_x, obj_y, hx, hy)
+                    map_texture_horz = game_controller.world.world_map_walls[world_grid_index] - 1
                     dof = 8  # End the loop, we hit a wall
                 else:  # Next line to check
                     rx += xo
@@ -112,10 +117,11 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
                 world_grid_index = map_y * game_controller.world.x + map_x
 
                 # Hit a wall
-                if 0 < world_grid_index < world_size and game_controller.world.world_map[world_grid_index] > 0:
+                if 0 < world_grid_index < world_size and game_controller.world.world_map_walls[world_grid_index] > 0:
                     vx = rx
                     vy = ry
                     distance_v = distance_two_points(obj_x, obj_y, vx, vy)
+                    map_texture_vert = game_controller.world.world_map_walls[world_grid_index] - 1
                     break
 
                 else:
@@ -130,6 +136,7 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
         # Vertical wall hit
         if distance_v < distance_h:
             # Set the color to be darker
+            map_texture_horz = map_texture_vert
             shade = 0.5
             color = (0.62, 0.125, 0.941)
             # color = (0, 1, 0)
@@ -144,7 +151,7 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
             ry = hy
             distance = distance_h
 
-        yield r, ra, rx, ry, distance, color, shade
+        yield r, ra, rx, ry, distance, color, shade, map_texture_horz
 
         ra += math.radians(1)
         if ra < 0:

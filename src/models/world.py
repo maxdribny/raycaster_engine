@@ -7,12 +7,12 @@ class World:
         self.__x = WORLD_SIZE_X
         self.__y = WORLD_SIZE_Y
         self.__scale = WORLD_SCALE
-        self.__world_map = [
+        self.__world_map_walls = [
             1, 1, 1, 1, 1, 1, 1, 1,
             1, 0, 1, 0, 0, 0, 1, 1,
             1, 0, 1, 0, 0, 0, 0, 1,
             1, 0, 0, 0, 0, 0, 0, 1,
-            1, 0, 0, 1, 0, 0, 0, 1,
+            1, 0, 0, 2, 0, 0, 0, 1,
             1, 0, 1, 1, 0, 0, 1, 1,
             1, 0, 0, 0, 0, 0, 0, 1,
             1, 1, 1, 1, 1, 1, 1, 1,
@@ -31,11 +31,11 @@ class World:
         return self.__scale
 
     @property
-    def world_map(self):
-        return self.__world_map
+    def world_map_walls(self):
+        return self.__world_map_walls
 
-    @world_map.setter
-    def world_map(self, new_map):
+    @world_map_walls.setter
+    def world_map_walls(self, new_map):
         # Check that the map is not empty
         if len(new_map) == 0:
             raise WorldMapError("The map cannot be empty")
@@ -49,4 +49,4 @@ class World:
             raise WorldMapError("The map must be the same size as the world, have you checked that the world map is "
                                 "coherent with WORLD_SIZE_X and WORLD_SIZE_Y?")
 
-        self.__world_map = new_map
+        self.__world_map_walls = new_map
