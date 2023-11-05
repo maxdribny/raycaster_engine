@@ -4,27 +4,25 @@ import math
 
 from src.utils import safe_tan, distance_two_points
 
-PI = math.pi
-BITS_TO_SHIFT = 0
-
 
 def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
-    global BITS_TO_SHIFT
+    pi = math.pi
+    bits_to_shift = 0
 
     color = (0, 1.0, 0)
     distance = 0
     rx = ry = xo = yo = 0.0
-    ra = (obj_angle - math.radians(num_rays / 2) + 2 * PI) % (2 * PI)
+    ra = (obj_angle - math.radians(num_rays / 2) + 2 * pi) % (2 * pi)
 
     # Total size of the world (i.e. total number of 'squares' in the world)
     world_size = game_controller.world.world_scale
 
     # Calcualte shift value based on world scale
-    if BITS_TO_SHIFT == 0:
+    if bits_to_shift == 0:
         shift_value = int(math.log2(world_size))
-        BITS_TO_SHIFT = shift_value
+        bits_to_shift = shift_value
     else:
-        shift_value = BITS_TO_SHIFT
+        shift_value = bits_to_shift
 
     for r in range(num_rays):
 
@@ -41,19 +39,19 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
 
         e = 0.000001
 
-        if ra > PI:  # Ray is looking up
+        if ra > pi:  # Ray is looking up
             ry = ((int(obj_y) >> shift_value) << shift_value) - e
             rx = (obj_y - ry) * a_tan + obj_x
             yo = -64
             xo = -yo * a_tan
 
-        if ra < PI:  # Ray is looking down
+        if ra < pi:  # Ray is looking down
             ry = ((int(obj_y) >> shift_value) << shift_value) + 64
             rx = (obj_y - ry) * a_tan + obj_x
             yo = 64
             xo = -yo * a_tan
 
-        if ra == 0 or ra == PI:  # Ray is looking parallel left or right (impossible to hit a horizontal wall)
+        if ra == 0 or ra == pi:  # Ray is looking parallel left or right (impossible to hit a horizontal wall)
             rx = obj_x
             ry = obj_y
             dof = 8
@@ -91,19 +89,19 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
 
         n_tan = -math.tan(safe_tan(ra))
 
-        if (PI / 2) < ra < (3 * PI / 2):  # Ray is looking left
+        if (pi / 2) < ra < (3 * pi / 2):  # Ray is looking left
             rx = ((int(obj_x) >> shift_value) << shift_value) - e
             ry = (obj_x - rx) * n_tan + obj_y
             xo = -64
             yo = -xo * n_tan
 
-        if ra < PI / 2 or ra > (3 * PI / 2):  # Ray is looking right
+        if ra < pi / 2 or ra > (3 * pi / 2):  # Ray is looking right
             rx = ((int(obj_x) >> shift_value) << shift_value) + 64
             ry = (obj_x - rx) * n_tan + obj_y
             xo = 64
             yo = -xo * n_tan
 
-        if ra == 0 or ra == PI:  # Ray is looking straight up or down
+        if ra == 0 or ra == pi:  # Ray is looking straight up or down
             rx = obj_x
             ry = obj_y
             dof = 8
@@ -155,6 +153,6 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
 
         ra += math.radians(1)
         if ra < 0:
-            ra += 2 * PI
-        if ra > 2 * PI:
-            ra -= 2 * PI
+            ra += 2 * pi
+        if ra > 2 * pi:
+            ra -= 2 * pi

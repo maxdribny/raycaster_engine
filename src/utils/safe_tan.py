@@ -1,9 +1,12 @@
 import math
 import sys
 
+from numba import jit
+
 FLOAT_MIN = sys.float_info.min
 
 
+@jit(nopython=True)
 def safe_tan(angle):
     # Some small epsilon value
     epsilon = 1e-10
