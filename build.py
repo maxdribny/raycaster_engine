@@ -12,6 +12,6 @@ print(f'Building version {FLAGS["VERSION"]}')
 output_name = f'Raycaster_v{FLAGS["VERSION"]}'
 
 command = 'pyinstaller'
-params = ['--log-level', 'TRACE', f'--name={output_name}', 'main.py']
+params = ['--log-level', 'TRACE', '--noconfirm', f'--name={output_name}', 'main.py']
 
 subprocess.run([command] + params)
