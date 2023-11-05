@@ -8,11 +8,12 @@ class Player:
         self.x = x
         self.y = y
         self.angle = math.radians(angle)
-        self.color = PLAYER_COLOR
         self.rotation_scale = PLAYER_ROTATION_SPEED
         self.move_speed = PLAYER_MOVE_SPEED
         self.dx, self.dy = math.cos(self.angle) * 5, math.sin(self.angle) * 5
+        self.color = PLAYER_COLOR
         self.FOV = RENDER_FOV
+        self.interact_distance = 25
 
     def update_angle(self, delta_angle):
         self.angle += delta_angle * self.rotation_scale

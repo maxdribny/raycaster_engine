@@ -14,6 +14,7 @@ class GameController:
     def update(self, delta_time):
         self.update_player_position(delta_time)
         self.check_debug_keys()
+        self.check_interaction_keys()
 
         if '\x1b' in self.keys_pressed:  # Escape key
             glutLeaveMainLoop()
@@ -31,18 +32,34 @@ class GameController:
             self.player.update_angle(-0.1 * delta_time)
         if 'd' in self.keys_pressed:
             self.player.update_angle(0.1 * delta_time)
-
         if 'w' in self.keys_pressed:
             if not is_colliding_y_forward:
                 self.player.move_forward_y(delta_time)
             if not is_colliding_x_forward:
                 self.player.move_foward_x(delta_time)
-
         if 's' in self.keys_pressed:
             if not is_colliding_y_backward:
                 self.player.move_backward_y(delta_time)
             if not is_colliding_x_backward:
                 self.player.move_backward_x(delta_time)
+
+    def check_interaction_keys(self):
+        # Interaction keys
+        if 'e' in self.keys_pressed:  # Open doors
+            self.open_door()
+
+    def open_door(self):
+        interact_distance = self.player.interact_distance
+
+        xo = -interact_distance if self.player.dx < 0 else (interact_distance if self.player.dx > 0 else 0)
+        yo = -interact_distance if self.player.dy < 0 else (interact_distance if self.player.dy > 0 else 0)
+        ipx = self.player.x / 64.0
+        ipy = self.player.y / 64.0
+        ipx_add_offset = int((self.player.x + xo) / 64.0)
+        ipy_add_offset = int((self.player.y + yo) / 64.0)
+
+        if self.world.world_map_walls[ipy_add_offset * self.world.x + ipx_add_offset] == 4:
+            self.world.world_map_walls[ipy_add_offset * self.world.x + ipx_add_offset] = 0
 
     def check_player_collision_forward(self):
         offset_value = 10

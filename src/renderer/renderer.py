@@ -100,17 +100,14 @@ class Renderer:
 
     def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, map_texture_pos, rx, ry, world_height=320,
                       world_width=160):
-
         world_height = world_height
         world_width = world_width
         line_offset_scale = 1.2
 
         cosine_angle = (pa - ra + 2 * PI) % (
                 2 * PI)  # player_angle - ray_angle, also bounds the values between 0 and 2 * PI noqa
-
         # Fisheye effect fix (see: https://lodev.org/cgtutor/raycasting.html)
         ray_distance = ray_distance * math.cos(cosine_angle)
-
         if ray_distance == 0:  # Prevent division by zero
             ray_distance = sys.float_info.min
 
@@ -128,7 +125,6 @@ class Renderer:
 
         # Drawing textures
         ra = math.degrees(ra)
-
         if shade == 1:
             # Horizontal walls
             texture_x = int(rx / 2.0) % 32
@@ -139,7 +135,6 @@ class Renderer:
             texture_x = int(ry / 2.0) % 32
             if 90 < ra < 270:
                 texture_x = 31 - texture_x
-
         texture_y = texture_offset * texture_step + map_texture_pos * 32
 
         glPointSize(8)
