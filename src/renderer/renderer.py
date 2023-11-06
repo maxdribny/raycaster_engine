@@ -58,7 +58,7 @@ class Renderer:
         border_thickness = 1
         print(f'\nComputing vertices...')
         pp = pprint.PrettyPrinter(indent=4)
-        
+
         for y in range(self.controller.world.map_grid_size_y):
             for x in range(self.controller.world.map_grid_size_x):
                 is_wall = self.controller.world.map_grid_walls[y * self.controller.world.map_grid_size_x + x] > 0
@@ -217,70 +217,6 @@ class Renderer:
             glWindowPos2i(900, 480)
             for char in f"FPS: {self.get_current_fps()}":
                 glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(char))  # noqa
-
-    # def draw_ceiling(self):
-    #     glColor3f(0, 1, 1)
-    #     glBegin(GL_QUADS)
-    #     glVertex2i(526, 0 + self.draw_offset)
-    #     glVertex2i(1006, 0 + self.draw_offset)
-    #     glVertex2i(1006, 160 + self.draw_offset)
-    #     glVertex2i(526, 160 + self.draw_offset)
-    #     glEnd()
-
-    # def draw_floor(self):
-    #     draw_offset = self.draw_offset + 30
-    #     glColor3f(0, 0, 1)
-    #     glBegin(GL_QUADS)
-    #     glVertex2i(526, 160 + draw_offset)
-    #     glVertex2i(1006, 160 + draw_offset)
-    #     glVertex2i(1006, 320 + draw_offset)
-    #     glVertex2i(526, 320 + draw_offset)
-    #     glEnd()
-
-    # def draw_floors(self, line_offset, line_height, pa, px, py, r, ra, rx, ry):
-    #     glPointSize(8)
-    #     glBegin(GL_POINTS)
-    #     for y in range(int(line_offset) + int(line_height), 320 + self.draw_offset + 30):
-    #         dy = y - ((320 + self.draw_offset + 30) / 2.0)
-    #         deg = math.radians(ra)
-    #         ra_fix = math.cos(math.radians(pa - ra))
-    #
-    #         tx = px / 2 + math.sin(deg) * 158 * 32 / dy / ra_fix
-    #         ty = py / 2 - math.cos(deg) * 158 * 32 / dy / ra_fix
-    #
-    #         # mp = self.controller.world.world_map_floor[
-    #         #          int(ty / 32.0) * self.controller.world.x + int(tx / 32)] * 32 * 32
-    #         print(f'{(int(ty) & 31) * 32 + (int(tx) & 31)}')
-    #
-    #         c = self.textures[(int(ty) & 31) * 32 + (int(tx) & 31)] * 0.7
-    #
-    #         glColor3f(c / 1.3, c / 1.3, c)
-    #         glVertex2i(r * 8 + 530, y)
-    #     glEnd()
-
-    # def draw_floors(self, line_offset, line_height, pa, px, py, r, ra, rx, ry, ray_distance):
-    #     glPointSize(8)
-    #     glBegin(GL_POINTS)
-    #     for y in range(int(line_offset) + int(line_height), 320 + self.draw_offset + 30):
-    #         dy = y - ((320 + line_offset) / 2.0)
-    #         deg = math.radians(ra)
-    #         ra_fix = math.cos(math.radians(pa - ra))
-    #
-    #         distance_to_screen = 158 * 32
-    #         current_distance = distance_to_screen / (dy / ra_fix)
-    #
-    #         weight = current_distance / ray_distance
-    #         floor_x = weight * rx + (1.0 - weight) * px
-    #         floor_y = weight * ry + (1.0 - weight) * py
-    #
-    #         tx = int(floor_x)
-    #         ty = int(floor_y)
-    #
-    #         c = self.textures[(int(ty) & 31) * 32 + (int(tx) & 31)] * 0.7
-    #
-    #         glColor3f(c / 1.3, c / 1.3, c)
-    #         glVertex2i(r * 8 + 530, y)
-    #     glEnd()
 
     def update_window_dimensions(self, window_width, window_height):
         self.window_width = window_width
