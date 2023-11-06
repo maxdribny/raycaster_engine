@@ -23,19 +23,14 @@ class Renderer:
         self.display_fps = True
         self.fps_callback = fps_callback
         self.textures = ALL_TEXTURES
+        self.ray_width = 8
 
         # Window / screen dimensions
         self.window_width = window_width
         self.window_height = window_height
 
-        print(f'Window width: {self.window_width}, Window height: {self.window_height}')
-
         # Precompute and cache vertices
         self.cached_vertices = self.precompute_vertices()
-
-        # 3D world drawing offsets
-        self.world_draw_offset_x = (self.window_width // 2) + 3  # Draw in center x of screen offset slightly right
-        self.world_draw_offset_y = self.window_height // 4  # We want to start drawing the y from 1/4 of the screen
 
     def get_current_fps(self):
         current_time = time.time()
@@ -99,8 +94,8 @@ class Renderer:
 
     def draw_rays_2d(self):
         player_angle = self.controller.player.angle
-        player_x = self.controller.player.map_grid_size_x
-        player_y = self.controller.player.map_grid_size_y
+        player_x = self.controller.player.x
+        player_y = self.controller.player.y
 
         for r, ra, rx, ry, distance, color, shade, map_texture_pos in raycaster_2d(player_angle,
                                                                                    player_x,
@@ -120,36 +115,30 @@ class Renderer:
             # Store the ray data for 3D drawing
             # self.ray_data.append((distance, r, player_angle, rx))
 
-    def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, map_texture_pos, rx, ry, world_height=400,
-                      world_width=400):
-
-        horizontal_offset = (self.window_width - world_width) // 2
+    def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, map_texture_pos, rx, ry, world_height=400):
+        world_width = self.ray_width * self.controller.player.FOV
+        horizontal_offset = (self.window_width // 2) + (((self.window_width // 2) - int(world_width)) // 2)
         vertical_offset = (self.window_height - world_height) // 2
-
-        print(f'Horizontal offset: {horizontal_offset}, Vertical offset: {vertical_offset}')
-
-        # Horizontal offset: 352.0, Vertical offset: 176.0
 
         cosine_angle = (pa - ra + 2 * PI) % (
                 2 * PI)  # player_angle - ray_angle, also bounds the values between 0 and 2 * PI noqa
+
         # Fisheye effect fix (see: https://lodev.org/cgtutor/raycasting.html)
         ray_distance = ray_distance * math.cos(cosine_angle)
         if ray_distance == 0:  # Prevent division by zero
             ray_distance = sys.float_info.min
 
         line_height = (self.controller.world.map_grid_size * world_height) / ray_distance
-
         texture_step = 32.0 / float(line_height)
         texture_offset = 0
 
+        # Adjust line height and texture offset for vertical centering within the window
         if line_height > world_height:
             texture_offset = (line_height - world_height) / 2
             line_height = world_height
 
-        line_offset = (world_height - line_height) / 2  # Center the line on the vertical axis
-
-        # Adjust line offset for vertical centering within the window
-        line_offset += vertical_offset
+        line_offset = (world_height - line_height) / 2  # Vertical centering
+        line_offset += vertical_offset  # Adjust line offset for vertical centering within the window
 
         # Drawing textures
         ra = math.degrees(ra)
@@ -165,11 +154,14 @@ class Renderer:
                 texture_x = 31 - texture_x
         texture_y = texture_offset * texture_step + map_texture_pos * 32
 
-        ray_width = 8
-
-        glPointSize(ray_width)
+        glPointSize(self.ray_width)
         glBegin(GL_POINTS)
+
         for y in range(int(line_height)):
+            # Prevent the 3d world from being drawn outside the window due to point size > 1
+            if y + line_offset + self.ray_width > world_height + vertical_offset:
+                break
+
             texture_color = self.textures[int(texture_y) * 32 + int(texture_x)] * shade
 
             # Draw walls with textures and colors
@@ -182,7 +174,8 @@ class Renderer:
             if map_texture_pos == 3:
                 glColor3f(texture_color / 2.0, texture_color, texture_color / 2.0)  # Door green
 
-            glVertex2i(ray_n * ray_width + horizontal_offset, int(y + line_offset))
+            # The actual width of the 3d world will always be total_ray_n * self.ray_width
+            glVertex2i(ray_n * self.ray_width + horizontal_offset, int(y + line_offset))
             texture_y += texture_step
         glEnd()
 
@@ -193,14 +186,14 @@ class Renderer:
         glColor3f(*self.controller.player.color)
         glPointSize(8)
         glBegin(GL_POINTS)
-        glVertex2i(int(self.controller.player.map_grid_size_x), int(self.controller.player.map_grid_size_y))
+        glVertex2i(int(self.controller.player.x), int(self.controller.player.y))
         glEnd()
 
         glLineWidth(3)
         glBegin(GL_LINES)
-        glVertex2i(int(self.controller.player.map_grid_size_x), int(self.controller.player.map_grid_size_y))
-        glVertex2i(int(self.controller.player.map_grid_size_x + self.controller.player.dx * 5),
-                   int(self.controller.player.map_grid_size_y + self.controller.player.dy * 5))
+        glVertex2i(int(self.controller.player.x), int(self.controller.player.y))
+        glVertex2i(int(self.controller.player.x + self.controller.player.dx * 5),
+                   int(self.controller.player.y + self.controller.player.dy * 5))
         glEnd()
 
     def display(self):
