@@ -58,6 +58,7 @@ class Renderer:
         border_thickness = 1
         print(f'\nComputing vertices...')
         pp = pprint.PrettyPrinter(indent=4)
+        
         for y in range(self.controller.world.map_grid_size_y):
             for x in range(self.controller.world.map_grid_size_x):
                 is_wall = self.controller.world.map_grid_walls[y * self.controller.world.map_grid_size_x + x] > 0
@@ -118,67 +119,6 @@ class Renderer:
 
             # Store the ray data for 3D drawing
             # self.ray_data.append((distance, r, player_angle, rx))
-
-    # def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, map_texture_pos, rx, ry, world_height=320,
-    #                   world_width=160):
-    #     world_height = world_height
-    #     world_width = world_width
-    #     line_offset_scale = 1.2
-    #
-    #     cosine_angle = (pa - ra + 2 * PI) % (
-    #             2 * PI)  # player_angle - ray_angle, also bounds the values between 0 and 2 * PI noqa
-    #     # Fisheye effect fix (see: https://lodev.org/cgtutor/raycasting.html)
-    #     ray_distance = ray_distance * math.cos(cosine_angle)
-    #     if ray_distance == 0:  # Prevent division by zero
-    #         ray_distance = sys.float_info.min
-    #
-    #     line_height = (self.controller.world.world_scale * world_height) / ray_distance
-    #
-    #     texture_step = 32.0 / float(line_height)
-    #     texture_offset = 0
-    #
-    #     if line_height > world_height:
-    #         texture_offset = (line_height - world_height) / 2
-    #         line_height = world_height
-    #
-    #     line_offset = (world_width * line_offset_scale) - line_height / 2
-    #     line_offset += 50
-    #
-    #     # Drawing textures
-    #     ra = math.degrees(ra)
-    #     if shade == 1:
-    #         # Horizontal walls
-    #         texture_x = int(rx / 2.0) % 32
-    #         if ra < 180:
-    #             texture_x = 31 - texture_x
-    #     else:
-    #         # Vertical walls
-    #         texture_x = int(ry / 2.0) % 32
-    #         if 90 < ra < 270:
-    #             texture_x = 31 - texture_x
-    #     texture_y = texture_offset * texture_step + map_texture_pos * 32
-    #
-    #     glPointSize(8)
-    #     glBegin(GL_POINTS)
-    #     for y in range(int(line_height)):
-    #         texture_color = self.textures[int(texture_y) * 32 + int(texture_x)] * shade
-    #
-    #         # Draw walls with textures and colors
-    #         if map_texture_pos == 0:
-    #             glColor3f(texture_color, texture_color / 2.0, texture_color / 2.0)  # Checkerboard red
-    #         if map_texture_pos == 1:
-    #             glColor3f(texture_color, texture_color, texture_color / 2.0)  # Brick yellow
-    #         if map_texture_pos == 2:
-    #             glColor3f(texture_color / 2.0, texture_color / 2.0, texture_color)  # Window blue
-    #         if map_texture_pos == 3:
-    #             glColor3f(texture_color / 2.0, texture_color, texture_color / 2.0)  # Door green
-    #
-    #         glVertex2i(ray_n * 8 + 530, int(y + line_offset))
-    #         texture_y += texture_step
-    #     glEnd()
-
-    # self.draw_floors(line_offset, line_height, pa, self.controller.player.x, self.controller.player.x, ray_n, ra,
-    #                  rx, ry, ray_distance)
 
     def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, map_texture_pos, rx, ry, world_height=400,
                       world_width=400):
