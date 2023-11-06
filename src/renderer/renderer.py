@@ -123,10 +123,10 @@ class Renderer:
 
         # Fisheye effect fix (see: https://lodev.org/cgtutor/raycasting.html)
         ray_distance = ray_distance * math.cos(cosine_angle)
-        if ray_distance == 0:  # Prevent division by zero
-            ray_distance = sys.float_info.min
+        ray_distance = max(ray_distance, sys.float_info.min)
 
         line_height = (self.controller.world.map_grid_size * world_height) / ray_distance
+
         texture_step = 32.0 / float(line_height)
         texture_offset = 0
 
@@ -135,8 +135,7 @@ class Renderer:
             texture_offset = (line_height - world_height) / 2
             line_height = world_height
 
-        line_offset = (world_height - line_height) / 2  # Vertical centering
-        line_offset += vertical_offset  # Adjust line offset for vertical centering within the window
+        line_offset = (world_height - line_height) / 2 + vertical_offset  # Adjust line for vertical centering
 
         # Drawing textures
         ra = math.degrees(ra)
@@ -164,11 +163,11 @@ class Renderer:
             # Draw walls with textures and colors
             if map_texture_pos == 0:
                 glColor3f(texture_color, texture_color / 2.0, texture_color / 2.0)  # Checkerboard red
-            elif map_texture_pos == 1:
+            if map_texture_pos == 1:
                 glColor3f(texture_color, texture_color, texture_color / 2.0)  # Brick yellow
-            elif map_texture_pos == 2:
+            if map_texture_pos == 2:
                 glColor3f(texture_color / 2.0, texture_color / 2.0, texture_color)  # Window blue
-            elif map_texture_pos == 3:
+            if map_texture_pos == 3:
                 glColor3f(texture_color / 2.0, texture_color, texture_color / 2.0)  # Door green
 
             # The actual width of the 3d world will always be total_ray_n * self.ray_width
