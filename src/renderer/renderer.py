@@ -163,11 +163,11 @@ class Renderer:
             # Draw walls with textures and colors
             if map_texture_pos == 0:
                 glColor3f(texture_color, texture_color / 2.0, texture_color / 2.0)  # Checkerboard red
-            if map_texture_pos == 1:
+            elif map_texture_pos == 1:
                 glColor3f(texture_color, texture_color, texture_color / 2.0)  # Brick yellow
-            if map_texture_pos == 2:
+            elif map_texture_pos == 2:
                 glColor3f(texture_color / 2.0, texture_color / 2.0, texture_color)  # Window blue
-            if map_texture_pos == 3:
+            elif map_texture_pos == 3:
                 glColor3f(texture_color / 2.0, texture_color, texture_color / 2.0)  # Door green
 
             # The actual width of the 3d world will always be total_ray_n * self.ray_width
