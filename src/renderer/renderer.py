@@ -112,13 +112,10 @@ class Renderer:
 
             self.draw_world_3d(distance, r, player_angle, ra, color, shade, map_texture_pos, rx=rx, ry=ry)
 
-        # Store the ray data for 3D drawing
-        # self.ray_data.append((distance, r, player_angle, rx))
-
     def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, map_texture_pos, rx, ry, world_height=400):
         world_width = self.ray_width * self.controller.player.FOV
         horizontal_offset = (self.window_width // 2) + ((self.window_width // 2) - int(world_width)) // 2 + (
-                    self.ray_width // 2)
+                self.ray_width // 2)
         vertical_offset = (self.window_height - world_height) // 2
 
         cosine_angle = (pa - ra + 2 * PI) % (
@@ -167,20 +164,17 @@ class Renderer:
             # Draw walls with textures and colors
             if map_texture_pos == 0:
                 glColor3f(texture_color, texture_color / 2.0, texture_color / 2.0)  # Checkerboard red
-            if map_texture_pos == 1:
+            elif map_texture_pos == 1:
                 glColor3f(texture_color, texture_color, texture_color / 2.0)  # Brick yellow
-            if map_texture_pos == 2:
+            elif map_texture_pos == 2:
                 glColor3f(texture_color / 2.0, texture_color / 2.0, texture_color)  # Window blue
-            if map_texture_pos == 3:
+            elif map_texture_pos == 3:
                 glColor3f(texture_color / 2.0, texture_color, texture_color / 2.0)  # Door green
 
             # The actual width of the 3d world will always be total_ray_n * self.ray_width
             glVertex2i(ray_n * self.ray_width + horizontal_offset, int(y + line_offset))
             texture_y += texture_step
         glEnd()
-
-    # self.draw_floors(line_offset, line_height, pa, self.controller.player.x, self.controller.player.x, ray_n, ra,
-    #                  rx, ry, ray_distance)
 
     def draw_player(self):
         glColor3f(*self.controller.player.color)
