@@ -58,8 +58,8 @@ class GameController:
         ipx_add_offset = int((self.player.x + xo) / 64.0)
         ipy_add_offset = int((self.player.y + yo) / 64.0)
 
-        if self.world.world_map_walls[ipy_add_offset * self.world.x + ipx_add_offset] == 4:
-            self.world.world_map_walls[ipy_add_offset * self.world.x + ipx_add_offset] = 0
+        if self.world.map_grid_walls[ipy_add_offset * self.world.map_grid_size_x + ipx_add_offset] == 4:
+            self.world.map_grid_walls[ipy_add_offset * self.world.map_grid_size_x + ipx_add_offset] = 0
 
     def check_player_collision_forward(self):
         offset_value = 10
@@ -75,15 +75,15 @@ class GameController:
         player_grid_pos_y_add_offset = int((self.player.y + y_offset) / 64)
         player_grid_pos_y_sub_offset = int((self.player.y - y_offset) / 64)
 
-        is_colliding_x_forward = self.world.world_map_walls[
-                                     player_grid_pos_y * self.world.x + player_grid_pos_x_add_offset] != 0
-        is_colliding_y_forward = self.world.world_map_walls[
-                                     player_grid_pos_y_add_offset * self.world.x + player_grid_pos_x] != 0
+        is_colliding_x_forward = self.world.map_grid_walls[
+                                     player_grid_pos_y * self.world.map_grid_size_x + player_grid_pos_x_add_offset] != 0
+        is_colliding_y_forward = self.world.map_grid_walls[
+                                     player_grid_pos_y_add_offset * self.world.map_grid_size_x + player_grid_pos_x] != 0
 
-        is_colliding_x_backward = self.world.world_map_walls[
-                                      player_grid_pos_y * self.world.x + player_grid_pos_x_sub_offset] != 0
-        is_colliding_y_backward = self.world.world_map_walls[
-                                      player_grid_pos_y_sub_offset * self.world.x + player_grid_pos_x] != 0
+        is_colliding_x_backward = self.world.map_grid_walls[
+                                      player_grid_pos_y * self.world.map_grid_size_x + player_grid_pos_x_sub_offset] != 0
+        is_colliding_y_backward = self.world.map_grid_walls[
+                                      player_grid_pos_y_sub_offset * self.world.map_grid_size_x + player_grid_pos_x] != 0
 
         return is_colliding_x_forward, is_colliding_y_forward, is_colliding_x_backward, is_colliding_y_backward
 

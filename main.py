@@ -29,7 +29,6 @@ def idle_func():
 
 
 game_controller = GameController()
-renderer = Renderer(game_controller, fps_callback)
 
 glutInit(sys.argv)
 glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA)
@@ -38,6 +37,7 @@ glutInitWindowPosition(500, 400)
 glutCreateWindow(src.models.constants.WINDOW_TITLE.encode('ascii'))
 
 # initialization code
+renderer = Renderer(game_controller, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT), fps_callback)
 glClearColor(0.3, 0.3, 0.3, 0)
 gluOrtho2D(0, src.models.constants.WINDOW_WIDTH, src.models.constants.WINDOW_HEIGHT, 0)
 

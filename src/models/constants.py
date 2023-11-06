@@ -15,14 +15,14 @@ WINDOW_HEIGHT = 512
 WINDOW_TITLE = "Raycaster" + (" " + VERSION)
 
 # World Settings
-WORLD_SIZE_X = 8
-WORLD_SIZE_Y = 8
-WORLD_SCALE = WORLD_SIZE_X * WORLD_SIZE_Y
+MAP_GRID_X = 8  # Number of tiles in X axis of the world
+MAP_GRID_Y = 8  # Number of tiles in Y axis of the world
+MAP_GRID_SIZE = MAP_GRID_X * MAP_GRID_Y
 
 # Player Settings
 PLAYER_INITIAL_X = 300.0
 PLAYER_INITIAL_Y = 300.0
-PLAYER_INITIAL_ANGLE = 0
+PLAYER_INITIAL_ANGLE = 180
 PLAYER_ROTATION_SPEED = 35
 PLAYER_MOVE_SPEED = 25
 PLAYER_COLOR = (1, 1, 0)
@@ -125,9 +125,9 @@ def create_default_config(directory, file_name):
             {"name": "WINDOW_WIDTH", "value": str(WINDOW_WIDTH), "type": "int"},
             {"name": "WINDOW_HEIGHT", "value": str(WINDOW_HEIGHT), "type": "int"},
             {"name": "WINDOW_TITLE", "value": WINDOW_TITLE, "type": "str"},
-            {"name": "WORLD_SCALE", "value": str(WORLD_SCALE), "type": "int"},
-            {"name": "WORLD_SIZE_X", "value": str(WORLD_SIZE_X), "type": "int"},
-            {"name": "WORLD_SIZE_Y", "value": str(WORLD_SIZE_Y), "type": "int"},
+            {"name": "WORLD_SCALE", "value": str(MAP_GRID_SIZE), "type": "int"},
+            {"name": "WORLD_SIZE_X", "value": str(MAP_GRID_X), "type": "int"},
+            {"name": "WORLD_SIZE_Y", "value": str(MAP_GRID_Y), "type": "int"},
             {"name": "PLAYER_INITIAL_X", "value": str(PLAYER_INITIAL_X), "type": "float"},
             {"name": "PLAYER_INITIAL_Y", "value": str(PLAYER_INITIAL_Y), "type": "float"},
             {"name": "PLAYER_INITIAL_ANGLE", "value": str(PLAYER_INITIAL_ANGLE), "type": "int"},

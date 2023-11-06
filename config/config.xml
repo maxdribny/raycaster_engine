@@ -32,7 +32,7 @@
     <type>float</type>
   </variable>
   <variable name="PLAYER_INITIAL_ANGLE">
-    <value>0</value>
+    <value>180</value>
     <type>int</type>
   </variable>
   <variable name="PLAYER_ROTATION_SPEED">

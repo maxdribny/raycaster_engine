@@ -15,7 +15,7 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
     ra = (obj_angle - math.radians(num_rays / 2) + 2 * pi) % (2 * pi)
 
     # Total size of the world (i.e. total number of 'squares' in the world)
-    world_size = game_controller.world.world_scale
+    world_size = game_controller.world.map_grid_size
 
     # Calcualte shift value based on world scale
     if bits_to_shift == 0:
@@ -60,16 +60,16 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
             map_y = int(ry) >> shift_value
 
             # Check if mx and my are within the bounds of the world
-            if 0 <= map_x < game_controller.world.x and 0 <= map_y < game_controller.world.y:
-                world_grid_index = map_y * game_controller.world.x + map_x
+            if 0 <= map_x < game_controller.world.map_grid_size_x and 0 <= map_y < game_controller.world.map_grid_size_y:
+                world_grid_index = map_y * game_controller.world.map_grid_size_x + map_x
 
                 # Hit a wall
-                if 0 < world_grid_index < world_size * game_controller.world.y and \
-                        game_controller.world.world_map_walls[
+                if 0 < world_grid_index < world_size * game_controller.world.map_grid_size_y and \
+                        game_controller.world.map_grid_walls[
                             world_grid_index] > 0:  # noqa
                     hx, hy = rx, ry
                     distance_h = distance_two_points(obj_x, obj_y, hx, hy)
-                    map_texture_horz = game_controller.world.world_map_walls[world_grid_index] - 1
+                    map_texture_horz = game_controller.world.map_grid_walls[world_grid_index] - 1
                     dof = 8  # End the loop, we hit a wall
                 else:  # Next line to check
                     rx += xo
@@ -110,15 +110,15 @@ def raycaster_2d(obj_angle, obj_x, obj_y, game_controller, num_rays=60):
             map_y = int(ry) >> shift_value
 
             # Check if mx and my are within the bounds of the world
-            if 0 <= map_x < game_controller.world.x and 0 <= map_y < game_controller.world.y:
-                world_grid_index = map_y * game_controller.world.x + map_x
+            if 0 <= map_x < game_controller.world.map_grid_size_x and 0 <= map_y < game_controller.world.map_grid_size_y:
+                world_grid_index = map_y * game_controller.world.map_grid_size_x + map_x
 
                 # Hit a wall
-                if 0 < world_grid_index < world_size and game_controller.world.world_map_walls[world_grid_index] > 0:
+                if 0 < world_grid_index < world_size and game_controller.world.map_grid_walls[world_grid_index] > 0:
                     vx = rx
                     vy = ry
                     distance_v = distance_two_points(obj_x, obj_y, vx, vy)
-                    map_texture_vert = game_controller.world.world_map_walls[world_grid_index] - 1
+                    map_texture_vert = game_controller.world.map_grid_walls[world_grid_index] - 1
                     break
 
                 else:
