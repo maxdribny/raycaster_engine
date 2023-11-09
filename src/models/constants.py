@@ -50,58 +50,6 @@ def set_new_constant(variable_name, value):
     print(f'Setting game parameter: {variable_name} = {value}')
 
 
-def load_config_from_xml(file_path):
-    tree = (ET.parse(file_path))
-    root = tree.getroot()
-
-    for variable in root.findall(".//variable"):
-        variable_name = variable.get('name')
-        value_str = variable.find('value').text
-        value_type = variable.find('type').text
-
-        if value_type == 'int':
-            value = int(value_str)
-        elif value_type == 'float':
-            value = float(value_str)
-        elif value_type == 'tuple':
-            value_str = value_str.strip('()')  # Remove parenthesis for correct parsing
-            value = tuple(map(int, value_str.split(',')))
-        elif value_type == 'str':
-            value = value_str
-        else:
-            print(f"\nUnsupported type {value_type} for variable {variable_name}. Skipping.")
-            continue
-
-        print(f'\nFound variable {variable_name} with value {value}')
-
-        try:
-            set_new_constant(variable_name, value)
-        except SettingKeyValueError as e:
-            print(e)
-            continue
-
-    print("\n---------------------")
-    print(f"XML LOADING COMPLETE")
-    print("---------------------\n")
-
-
-def config_indent(elem, level=0):
-    """Helper function to add indentation to an ElementTree element."""
-    i = '\n' + level * '  '
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + '  '
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-        for elem in elem:
-            config_indent(elem, level + 1)
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-    else:
-        if level and (not elem.tail or not elem.tail.strip()):
-            elem.tail = i
-
-
 def create_default_config(directory, file_name):
     # Check if the directory exists
     if not os.path.exists(directory):
@@ -158,9 +106,59 @@ def create_default_config(directory, file_name):
         print(f'File {file_path} already exists, skipping creation.')
 
 
-# Ensure config directory and file exist
-create_default_config('./config', 'config.xml')
+def load_config_from_xml(file_path):
+    tree = (ET.parse(file_path))
+    root = tree.getroot()
 
-# TODO: Fix this as it is still broken
+    for variable in root.findall(".//variable"):
+        variable_name = variable.get('name')
+        value_str = variable.find('value').text
+        value_type = variable.find('type').text
+
+        if value_type == 'int':
+            value = int(value_str)
+        elif value_type == 'float':
+            value = float(value_str)
+        elif value_type == 'tuple':
+            value_str = value_str.strip('()')  # Remove parenthesis for correct parsing
+            value = tuple(map(int, value_str.split(',')))
+        elif value_type == 'str':
+            value = value_str
+        else:
+            print(f"\nUnsupported type '{value_type}' found for variable '{variable_name}'. Skipping.")
+            continue
+
+        print(f'\nFound variable {variable_name} with value {value}')
+
+        try:
+            set_new_constant(variable_name, value)
+        except SettingKeyValueError as e:
+            print(e)
+            continue
+
+    print("\n---------------------")
+    print(f"XML LOADING COMPLETE")
+    print("---------------------\n")
+
+
+def config_indent(elem, level=0):
+    """Helper function to add indentation to an ElementTree element."""
+    i = '\n' + level * '  '
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + '  '
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            config_indent(elem, level + 1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
+
+
+# Ensure config directory and file exist
+create_default_config('.\\config', 'config.xml')
 # Load config file at the start of the game
-load_config_from_xml('./config/config.xml')
+load_config_from_xml('.\\config\\config.xml')

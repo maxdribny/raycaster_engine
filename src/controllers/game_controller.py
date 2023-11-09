@@ -22,6 +22,28 @@ class GameController:
 
         glutPostRedisplay()
 
+    def handle_keyboard_input_down(self, key, x, y):
+        key = key.decode('ascii')
+        self.keys_pressed.add(key)
+        self.keys_just_pressed.add(key)
+
+    def handle_keyboard_input_up(self, key, x, y):
+        key = key.decode('ascii')
+        self.keys_pressed.discard(key)
+        self.keys_just_pressed.discard(key)
+
+    def check_interaction_keys(self):
+        # Interaction keys
+        if 'e' in self.keys_pressed:  # Open doors
+            self.open_door()
+
+    def check_debug_keys(self):
+        # Debug keys
+        if 'q' in self.keys_just_pressed:  # Just pressed
+            self.keys_just_pressed.remove('q')
+        if 'v' in self.keys_just_pressed:  # Just pressed
+            self.keys_just_pressed.remove('v')
+
     def update_player_position(self, delta_time):
         # Check collision
         (is_colliding_x_forward, is_colliding_y_forward,
@@ -43,11 +65,6 @@ class GameController:
             if not is_colliding_x_backward:
                 self.player.move_backward_x(delta_time)
 
-    def check_interaction_keys(self):
-        # Interaction keys
-        if 'e' in self.keys_pressed:  # Open doors
-            self.open_door()
-
     def open_door(self):
         interact_distance = self.player.interact_distance
 
@@ -59,7 +76,8 @@ class GameController:
         ipy_add_offset = int((self.player.y + yo) / 64.0)
 
         if self.world.map_grid_walls[ipy_add_offset * self.world.map_grid_size_x + ipx_add_offset] == 4:
-            self.world.map_grid_walls[ipy_add_offset * self.world.map_grid_size_x + ipx_add_offset] = 0
+            self.world.update_wall_at_position(ipx_add_offset, ipy_add_offset, 0)
+            self.world.is_updated = True
 
     def check_player_collision_forward(self):
         offset_value = 10
@@ -86,20 +104,3 @@ class GameController:
                                       player_grid_pos_y_sub_offset * self.world.map_grid_size_x + player_grid_pos_x] != 0
 
         return is_colliding_x_forward, is_colliding_y_forward, is_colliding_x_backward, is_colliding_y_backward
-
-    def handle_keyboard_input_down(self, key, x, y):
-        key = key.decode('ascii')
-        self.keys_pressed.add(key)
-        self.keys_just_pressed.add(key)
-
-    def handle_keyboard_input_up(self, key, x, y):
-        key = key.decode('ascii')
-        self.keys_pressed.discard(key)
-        self.keys_just_pressed.discard(key)
-
-    def check_debug_keys(self):
-        # Debug keys
-        if 'q' in self.keys_just_pressed:  # Just pressed
-            self.keys_just_pressed.remove('q')
-        if 'v' in self.keys_just_pressed:  # Just pressed
-            self.keys_just_pressed.remove('v')

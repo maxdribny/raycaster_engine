@@ -2,7 +2,6 @@
 
 import math
 import time
-import pprint
 
 from collections import deque
 
@@ -18,69 +17,36 @@ from src.renderer.raycaster import raycaster_2d
 class Renderer:
     def __init__(self, game_controller, window_width, window_height, fps_callback=None):
         self.controller = game_controller
+        self.textures = ALL_TEXTURES
+        self.draw_calls = 0
+        self.ray_width = 8
+
+        # FPS display
         self.last_frame_time = time.time()
         self.fps_list = deque(maxlen=15)
         self.display_fps = True
         self.fps_callback = fps_callback
-        self.textures = ALL_TEXTURES
-        self.ray_width = 8
 
         # Window / screen dimensions
         self.window_width = window_width
         self.window_height = window_height
 
         # Precompute and cache vertices
-        self.cached_vertices = self.precompute_vertices()
+        self.cached_vertices = self.precompute_vertices_2d_world()
 
-    def get_current_fps(self):
-        current_time = time.time()
-        delta_time = current_time - self.last_frame_time
-        self.last_frame_time = current_time
+    def display(self):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        self.draw_world_2d()
+        self.draw_rays_2d()
+        self.draw_player()
+        self.draw_fps()
+        glutSwapBuffers()
 
-        fps = (int(1 / delta_time)) if delta_time > 0 else 0
-        self.fps_list.append(fps)
-
-        average_fps = sum(self.fps_list) // len(self.fps_list)
-
-        # Call the callback function if it is set
-        if self.fps_callback:
-            self.fps_callback(average_fps, delta_time)
-
-        return average_fps
-
-    def precompute_vertices(self):
-        vertices = []
-        border_thickness = 1
-        print(f'\nComputing vertices...')
-        pp = pprint.PrettyPrinter(indent=4)
-
-        for y in range(self.controller.world.map_grid_size_y):
-            for x in range(self.controller.world.map_grid_size_x):
-                is_wall = self.controller.world.map_grid_walls[y * self.controller.world.map_grid_size_x + x] > 0
-
-                x_offset = x * self.controller.world.map_grid_size
-                y_offset = y * self.controller.world.map_grid_size
-
-                # Slightly smaller coordinates for drawing the quad
-                v1 = (x_offset + border_thickness, y_offset + border_thickness)
-                v2 = (x_offset + border_thickness, y_offset + self.controller.world.map_grid_size - border_thickness)
-                v3 = (x_offset + self.controller.world.map_grid_size - border_thickness,
-                      y_offset + self.controller.world.map_grid_size - border_thickness)
-                v4 = (x_offset + self.controller.world.map_grid_size - border_thickness, y_offset + border_thickness)
-
-                print(f'\nPos: ({x}, {y})')
-                pp.pprint(({
-                    'is_wall': is_wall,
-                    'v1': v1,
-                    'v2': v2,
-                    'v3': v3,
-                    'v4': v4
-                }))
-
-                vertices.append((is_wall, v1, v2, v3, v4))
-
-        print(f'\nVertices computed: {len(vertices)}')
-        return vertices
+        self.draw_calls += 1
+        if self.draw_calls >= 75:
+            if self.controller.world.is_updated:
+                self.check_for_world_has_changed()
+                self.draw_calls = 0
 
     def draw_world_2d(self):
         glBegin(GL_QUADS)
@@ -189,13 +155,32 @@ class Renderer:
                    int(self.controller.player.y + self.controller.player.dy * 5))
         glEnd()
 
-    def display(self):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        self.draw_world_2d()
-        self.draw_rays_2d()
-        self.draw_player()
-        self.draw_fps()
-        glutSwapBuffers()
+    # TODO: this doesn't work with doors, because doors change what needs to be dawn in the 2d world
+    def precompute_vertices_2d_world(self):
+        vertices = []
+        border_thickness = 1
+        print(f'\nComputing vertices...')
+
+        for y in range(self.controller.world.map_grid_size_y):
+            for x in range(self.controller.world.map_grid_size_x):
+                is_wall = self.controller.world.map_grid_walls[y * self.controller.world.map_grid_size_x + x] > 0
+
+                x_offset = x * self.controller.world.map_grid_size
+                y_offset = y * self.controller.world.map_grid_size
+
+                # Slightly smaller coordinates for drawing the quad
+                v1 = (x_offset + border_thickness, y_offset + border_thickness)
+                v2 = (
+                    x_offset + border_thickness, y_offset + self.controller.world.map_grid_size - border_thickness)
+                v3 = (x_offset + self.controller.world.map_grid_size - border_thickness,
+                      y_offset + self.controller.world.map_grid_size - border_thickness)
+                v4 = (
+                    x_offset + self.controller.world.map_grid_size - border_thickness, y_offset + border_thickness)
+
+                vertices.append((is_wall, v1, v2, v3, v4))
+
+        print(f'\nVertices computed: {len(vertices)}')
+        return vertices
 
     def draw_fps(self):
         if self.display_fps:
@@ -204,9 +189,52 @@ class Renderer:
             for char in f"FPS: {self.get_current_fps()}":
                 glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(char))  # noqa
 
-    def update_window_dimensions(self, window_width, window_height):
-        self.window_width = window_width
-        self.window_height = window_height
+    def get_current_fps(self):
+        current_time = time.time()
+        delta_time = current_time - self.last_frame_time
+        self.last_frame_time = current_time
+
+        fps = (int(1 / delta_time)) if delta_time > 0 else 0
+        self.fps_list.append(fps)
+
+        average_fps = sum(self.fps_list) // len(self.fps_list)
+
+        # Call the callback function if it is set
+        if self.fps_callback:
+            self.fps_callback(average_fps, delta_time)
+
+        return average_fps
+
+    def update_cached_world_2d(self, x, y, is_wall):
+        index = y * self.controller.world.map_grid_size_x + x
+        border_thickness = 1
+        x_offset = x * self.controller.world.map_grid_size
+        y_offset = y * self.controller.world.map_grid_size
+
+        v1 = (x_offset + border_thickness, y_offset + border_thickness)
+        v2 = (
+            x_offset + border_thickness, y_offset + self.controller.world.map_grid_size - border_thickness)
+        v3 = (x_offset + self.controller.world.map_grid_size - border_thickness,
+              y_offset + self.controller.world.map_grid_size - border_thickness)
+        v4 = (
+            x_offset + self.controller.world.map_grid_size - border_thickness, y_offset + border_thickness)
+
+        self.cached_vertices[index] = (is_wall, v1, v2, v3, v4)
+
+    def check_for_world_has_changed(self):
+        for y in range(self.controller.world.map_grid_size_y):
+            for x in range(self.controller.world.map_grid_size_x):
+                current_index_is_wall = self.controller.world.map_grid_walls[
+                                            y * self.controller.world.map_grid_size_x + x] > 0
+                cached_is_wall = self.cached_vertices[y * self.controller.world.map_grid_size_x + x][0]
+
+                # Check if there is a difference between the current state and the cached state and update if there is
+                if current_index_is_wall != cached_is_wall:
+                    self.update_cached_world_2d(x, y, current_index_is_wall)
+
+    def update_window_dimensions(self, x, y):
+        self.window_width = x
+        self.window_height = y
 
     def clamp_angle(self, a):  # noqa
         if a > 359:

@@ -38,6 +38,7 @@ glutCreateWindow(src.models.constants.WINDOW_TITLE.encode('ascii'))
 
 # initialization code
 renderer = Renderer(game_controller, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT), fps_callback)
+
 glClearColor(0.3, 0.3, 0.3, 0)
 gluOrtho2D(0, src.models.constants.WINDOW_WIDTH, src.models.constants.WINDOW_HEIGHT, 0)
 
@@ -46,5 +47,4 @@ glutKeyboardUpFunc(game_controller.handle_keyboard_input_up)
 glutDisplayFunc(renderer.display)
 glutReshapeFunc(window_resize)
 glutIdleFunc(idle_func)
-# glutKeyboardFunc(game_controller.handle_keyboard_input)
 glutMainLoop()

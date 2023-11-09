@@ -9,14 +9,15 @@ class World:
         self.__scale = MAP_GRID_SIZE
         self.__map_grid_walls = [
             2, 2, 2, 2, 2, 2, 2, 2,
-            2, 0, 1, 0, 0, 1, 1, 1,
-            2, 0, 1, 0, 0, 1, 0, 1,
+            2, 0, 1, 0, 0, 2, 0, 1,
+            2, 0, 1, 0, 0, 0, 0, 1,
             2, 0, 4, 0, 0, 0, 0, 1,
             2, 0, 1, 0, 0, 0, 0, 1,
             2, 0, 4, 0, 0, 1, 0, 1,
             2, 0, 1, 0, 0, 1, 0, 1,
             2, 1, 1, 1, 1, 1, 1, 1,
         ]
+        self.__is_updated = False
 
     @property
     def map_grid_size_x(self):
@@ -50,3 +51,28 @@ class World:
                                 "coherent with WORLD_SIZE_X and WORLD_SIZE_Y?")
 
         self.__map_grid_walls = new_map
+
+    @property
+    def is_updated(self):
+        update_return = self.__is_updated
+
+        if self.__is_updated:
+            self.__is_updated = False
+
+        return update_return
+
+    @is_updated.setter
+    def is_updated(self, value):
+        self.__is_updated = value
+
+    def update_wall_at_position(self, x, y, new_value):
+        # Check that the x and y values are within the world bounds
+        if x < 0 or x > self.map_grid_size_x or y < 0 or y > self.map_grid_size_y:
+            raise WorldMapError(f"Cannot update wall at position ({x}, {y}), the position is out of bounds")
+
+        # Check that the new value is an integer
+        if not isinstance(new_value, int):
+            raise WorldMapError(f"Cannot update wall at position ({x}, {y}), the new value must be an integer")
+
+        # Update the value
+        self.__map_grid_walls[y * self.map_grid_size_x + x] = new_value
