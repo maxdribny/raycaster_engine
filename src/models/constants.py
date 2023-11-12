@@ -29,7 +29,6 @@ PLAYER_COLOR = (1, 1, 0)
 
 # Render Settings
 RENDER_FOV = 60
-
 # Debug Settings
 DEBUG_LOG_TO_CONSOLE = True
 

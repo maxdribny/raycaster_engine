@@ -80,6 +80,7 @@ class Renderer:
 
     def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, map_texture_pos, rx, ry, world_height=400):
         world_width = self.ray_width * self.controller.player.FOV
+
         horizontal_offset = (self.window_width // 2) + ((self.window_width // 2) - int(world_width)) // 2 + (
                 self.ray_width // 2)
         vertical_offset = (self.window_height - world_height) // 2
@@ -141,6 +142,39 @@ class Renderer:
             texture_y += texture_step
         glEnd()
 
+        # TODO: Fix drawing floors
+
+        # Draw floors
+        for y in range(int(line_offset + line_height), int(world_height)):
+            # Perspective calculation
+            perspective = (y - world_height / 2.0) / (world_width / 2.0)
+            distance = world_height / perspective
+
+            # Correct angle and calculate postion
+            angle = self.clamp_angle(pa - ra)
+            floor_x = self.controller.player.x + math.cos(angle) * distance
+            floor_y = self.controller.player.y - math.sin(angle) * distance
+
+            # Texture mapping
+            tx = int(floor_x) % 32
+            ty = int(floor_y) % 32
+
+            print(f'Texture x: {tx}, Texture y: {ty}')
+
+            texture_index = (ty * 32 + tx) % len(self.textures)
+
+            print(f'Texture index: {texture_index}')
+
+            # Get color from texture and apply shading
+            if 0 <= texture_index < len(self.textures):
+                texture_color = self.textures[texture_index] * shade
+
+                glColor3f(texture_color, texture_color, texture_color)
+                glPointSize(self.ray_width)  # Adjust point size if necessary
+                glBegin(GL_POINTS)
+                glVertex2i(ray_n * self.ray_width + horizontal_offset, y)
+                glEnd()
+
     def draw_player(self):
         glColor3f(*self.controller.player.color)
         glPointSize(8)
@@ -155,7 +189,6 @@ class Renderer:
                    int(self.controller.player.y + self.controller.player.dy * 5))
         glEnd()
 
-    # TODO: this doesn't work with doors, because doors change what needs to be dawn in the 2d world
     def precompute_vertices_2d_world(self):
         vertices = []
         border_thickness = 1

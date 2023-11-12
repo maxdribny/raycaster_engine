@@ -17,7 +17,21 @@ class World:
             2, 0, 1, 0, 0, 1, 0, 1,
             2, 1, 1, 1, 1, 1, 1, 1,
         ]
+        self.__map_grid_floors = [
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 1, 1, 0, 0,
+            0, 0, 0, 0, 2, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 2, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 1, 1, 1, 1, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+        ]
         self.__is_updated = False
+
+    @property
+    def map_grid_floors(self):
+        return self.__map_grid_floors
 
     @property
     def map_grid_size_x(self):
