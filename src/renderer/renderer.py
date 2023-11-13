@@ -143,7 +143,6 @@ class Renderer:
         glEnd()
 
         # TODO: Fix drawing floors
-
         # Draw floors
         for y in range(int(line_offset + line_height), int(world_height)):
             # Perspective calculation
@@ -159,11 +158,10 @@ class Renderer:
             tx = int(floor_x) % 32
             ty = int(floor_y) % 32
 
-            print(f'Texture x: {tx}, Texture y: {ty}')
-
             texture_index = (ty * 32 + tx) % len(self.textures)
 
-            print(f'Texture index: {texture_index}')
+            if texture_index > 1023:
+                print(f'Index: {texture_index} | tx: {tx} | ty: {ty} | floor_x: {floor_x} | floor_y: {floor_y} | ')
 
             # Get color from texture and apply shading
             if 0 <= texture_index < len(self.textures):
