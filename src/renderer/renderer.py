@@ -31,11 +31,25 @@ class Renderer:
         self.window_width = window_width
         self.window_height = window_height
 
+        # 3D world dimension
+        self.world_width = self.ray_width * self.controller.player.FOV
+        self.world_height = 400
+
+        # Padding for drawing the ceiling and floor
+        self.padding = ((self.window_width // 2) - self.world_width) // 2
+
+        # Horizontal and vertical offset for drawing 3d world
+        self.horizontal_offset = (self.window_width // 2) + (
+                (self.window_width // 2) - int(self.world_width)) // 2 + (self.ray_width // 2)
+        self.vertical_offset = (self.window_height - self.world_height) // 2
+
         # Precompute and cache vertices
         self.cached_vertices = self.precompute_vertices_2d_world()
 
     def display(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        self.draw_ceiling()
+        self.draw_floor()
         self.draw_world_2d()
         self.draw_rays_2d()
         self.draw_player()
@@ -78,12 +92,12 @@ class Renderer:
 
             self.draw_world_3d(distance, r, player_angle, ra, color, shade, map_texture_pos, rx=rx, ry=ry)
 
-    def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, map_texture_pos, rx, ry, world_height=400):
-        world_width = self.ray_width * self.controller.player.FOV
+    def draw_world_3d(self, ray_distance, ray_n, pa, ra, color, shade, map_texture_pos, rx, ry):
 
-        horizontal_offset = (self.window_width // 2) + ((self.window_width // 2) - int(world_width)) // 2 + (
-                self.ray_width // 2)
-        vertical_offset = (self.window_height - world_height) // 2
+        world_height = self.world_height
+
+        horizontal_offset = self.horizontal_offset
+        vertical_offset = self.vertical_offset
 
         cosine_angle = (pa - ra + 2 * PI) % (
                 2 * PI)  # player_angle - ray_angle, also bounds the values between 0 and 2 * PI noqa
@@ -142,37 +156,6 @@ class Renderer:
             texture_y += texture_step
         glEnd()
 
-        # TODO: Fix drawing floors
-        # Draw floors
-        for y in range(int(line_offset + line_height), int(world_height)):
-            # Perspective calculation
-            perspective = (y - world_height / 2.0) / (world_width / 2.0)
-            distance = world_height / perspective
-
-            # Correct angle and calculate postion
-            angle = self.clamp_angle(pa - ra)
-            floor_x = self.controller.player.x + math.cos(angle) * distance
-            floor_y = self.controller.player.y - math.sin(angle) * distance
-
-            # Texture mapping
-            tx = int(floor_x) % 32
-            ty = int(floor_y) % 32
-
-            texture_index = (ty * 32 + tx) % len(self.textures)
-
-            if texture_index > 1023:
-                print(f'Index: {texture_index} | tx: {tx} | ty: {ty} | floor_x: {floor_x} | floor_y: {floor_y} | ')
-
-            # Get color from texture and apply shading
-            if 0 <= texture_index < len(self.textures):
-                texture_color = self.textures[texture_index] * shade
-
-                glColor3f(texture_color, texture_color, texture_color)
-                glPointSize(self.ray_width)  # Adjust point size if necessary
-                glBegin(GL_POINTS)
-                glVertex2i(ray_n * self.ray_width + horizontal_offset, y)
-                glEnd()
-
     def draw_player(self):
         glColor3f(*self.controller.player.color)
         glPointSize(8)
@@ -185,6 +168,25 @@ class Renderer:
         glVertex2i(int(self.controller.player.x), int(self.controller.player.y))
         glVertex2i(int(self.controller.player.x + self.controller.player.dx * 5),
                    int(self.controller.player.y + self.controller.player.dy * 5))
+        glEnd()
+
+    def draw_ceiling(self):
+        c = (0.05, 0.05, 0.4)
+        glColor3f(*c)
+        glBegin(GL_QUADS)
+        glVertex2i(self.horizontal_offset - 4, self.vertical_offset)
+        glVertex2i(self.horizontal_offset - 4, self.window_height // 2)
+        glVertex2i(self.window_width - self.padding, self.window_height // 2)
+        glVertex2i(self.window_width - self.padding, self.vertical_offset)
+        glEnd()
+
+    def draw_floor(self):
+        glColor3f(0.4, 0.4, 0.4)
+        glBegin(GL_QUADS)
+        glVertex2i(self.horizontal_offset - 4, self.window_height // 2)
+        glVertex2i(self.horizontal_offset - 4, self.window_height - self.vertical_offset - 4)
+        glVertex2i(self.window_width - self.padding, self.window_height - self.vertical_offset - 4)
+        glVertex2i(self.window_width - self.padding, self.window_height // 2)
         glEnd()
 
     def precompute_vertices_2d_world(self):
